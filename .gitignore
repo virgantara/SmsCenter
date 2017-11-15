@@ -1,0 +1,6 @@
+*.class
+*.db
+*.sql
+*.zip
+
+*.csv
