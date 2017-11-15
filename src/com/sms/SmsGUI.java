@@ -6,6 +6,7 @@
 package com.sms;
 
 import com.sms.entity.Kontak;
+import com.sms.entity.KontakGroup;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -30,6 +31,9 @@ public class SmsGUI extends javax.swing.JFrame {
     SmsService sms = null;
     ScheduledExecutorService exec = null;
 
+    KontakGroup selectedGroup = null;
+    Kontak selectedContact = null;
+
     /**
      * Creates new form SmsGUI
      */
@@ -51,17 +55,22 @@ public class SmsGUI extends javax.swing.JFrame {
         im.put(enterKey, "Action.enter");
         am.put("Action.enter", new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
-                
+
                 tblKontak.changeSelection(tblKontak.getSelectedRow(), 1, false, false);
                 if (!tblKontak.editCellAt(tblKontak.getSelectedRow(), 1)) {
                     JOptionPane.showMessageDialog(tblKontak, "Failed to start cell editing");
                 }
             }
         });
-        display(sms.getDB().getKontaks());
+        displayContacts(sms.getDB().getKontaks());
+        displayGroups(sms.getDB().getGroups());
     }
 
-    public void display(List list) {
+    private void refreshGroup() {
+        displayGroups(sms.getDB().getGroups());
+    }
+
+    public void displayContacts(List list) {
 
         Vector<String> tableHeaders = new Vector<>();
         Vector tableData = new Vector();
@@ -84,6 +93,28 @@ public class SmsGUI extends javax.swing.JFrame {
             tableData.add(row);
         }
         tblKontak.setModel(new DefaultTableModel(tableData, tableHeaders));
+    }
+
+    public void displayGroups(List list) {
+        DefaultTableModel dtm = new DefaultTableModel();
+        dtm.setRowCount(0);
+
+        dtm.addColumn("No");
+        dtm.addColumn("Kode");
+        dtm.addColumn("Nama");
+
+        for (Object obj : list) {
+
+            KontakGroup grup = (KontakGroup) obj;
+            Vector<Object> row = new Vector<>();
+
+            row.add(grup.getGroupId());
+            row.add(grup.getGroupCode());
+            row.add(grup.getGroupName());
+            dtm.addRow(row);
+        }
+
+        tblGrup.setModel(dtm);
     }
 
     /**
@@ -115,6 +146,18 @@ public class SmsGUI extends javax.swing.JFrame {
         btnAddKontak = new javax.swing.JButton();
         btnUpdateKontak = new javax.swing.JButton();
         btnDeleteKontak = new javax.swing.JButton();
+        lblNomor1 = new javax.swing.JLabel();
+        cbGrup = new javax.swing.JComboBox<>();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblGrup = new javax.swing.JTable();
+        jLabel4 = new javax.swing.JLabel();
+        txtGrupNama = new javax.swing.JTextField();
+        lblNomor2 = new javax.swing.JLabel();
+        txtGrupKode = new javax.swing.JTextField();
+        btnAddGrup = new javax.swing.JButton();
+        btnUpdateGrup = new javax.swing.JButton();
+        btnDeleteGrup = new javax.swing.JButton();
         btnStart = new javax.swing.JButton();
         btnStop = new javax.swing.JButton();
         lblStatus = new javax.swing.JLabel();
@@ -223,6 +266,8 @@ public class SmsGUI extends javax.swing.JFrame {
 
         btnDeleteKontak.setText("Delete");
 
+        lblNomor1.setText("Grup :");
+
         javax.swing.GroupLayout pnlContactsLayout = new javax.swing.GroupLayout(pnlContacts);
         pnlContacts.setLayout(pnlContactsLayout);
         pnlContactsLayout.setHorizontalGroup(
@@ -232,19 +277,21 @@ public class SmsGUI extends javax.swing.JFrame {
                 .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(pnlContactsLayout.createSequentialGroup()
+                        .addComponent(btnAddKontak)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnUpdateKontak)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnDeleteKontak))
+                    .addGroup(pnlContactsLayout.createSequentialGroup()
                         .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblNomor)
-                            .addComponent(jLabel3))
+                            .addComponent(jLabel3)
+                            .addComponent(lblNomor1))
                         .addGap(18, 18, 18)
-                        .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtKontakNama, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtKontakNomor, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(pnlContactsLayout.createSequentialGroup()
-                        .addComponent(btnAddKontak)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnUpdateKontak)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnDeleteKontak)))
+                        .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtKontakNama, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+                            .addComponent(txtKontakNomor, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+                            .addComponent(cbGrup, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(143, Short.MAX_VALUE))
         );
         pnlContactsLayout.setVerticalGroup(
@@ -260,15 +307,117 @@ public class SmsGUI extends javax.swing.JFrame {
                 .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNomor)
                     .addComponent(txtKontakNomor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblNomor1)
+                    .addComponent(cbGrup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(28, 28, 28)
                 .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddKontak)
                     .addComponent(btnUpdateKontak)
                     .addComponent(btnDeleteKontak))
-                .addContainerGap(317, Short.MAX_VALUE))
+                .addContainerGap(276, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Contacts", pnlContacts);
+
+        tblGrup.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "No", "Kode", "Nama"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Object.class, java.lang.Object.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        tblGrup.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tblGrupMousePressed(evt);
+            }
+        });
+        jScrollPane3.setViewportView(tblGrup);
+        if (tblGrup.getColumnModel().getColumnCount() > 0) {
+            tblGrup.getColumnModel().getColumn(0).setMinWidth(50);
+        }
+
+        jLabel4.setText("Nama :");
+
+        lblNomor2.setText("Kode :");
+
+        btnAddGrup.setText("Add");
+        btnAddGrup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddGrupActionPerformed(evt);
+            }
+        });
+
+        btnUpdateGrup.setText("Update");
+        btnUpdateGrup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateGrupActionPerformed(evt);
+            }
+        });
+
+        btnDeleteGrup.setText("Delete");
+        btnDeleteGrup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteGrupActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNomor2)
+                            .addComponent(jLabel4))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtGrupNama)
+                            .addComponent(txtGrupKode, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnAddGrup)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnUpdateGrup)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnDeleteGrup)))
+                .addContainerGap(143, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtGrupNama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblNomor2)
+                    .addComponent(txtGrupKode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAddGrup)
+                    .addComponent(btnUpdateGrup)
+                    .addComponent(btnDeleteGrup))
+                .addContainerGap(329, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Groups", jPanel1);
 
         btnStart.setText("Start");
         btnStart.setName("btnStart"); // NOI18N
@@ -403,6 +552,61 @@ public class SmsGUI extends javax.swing.JFrame {
 // TODO add your handling code here:
     }//GEN-LAST:event_btnSendActionPerformed
 
+    private void btnUpdateGrupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateGrupActionPerformed
+
+        if (this.selectedGroup != null) {
+            if (!txtGrupNama.getText().isEmpty() && !txtGrupKode.getText().isEmpty()) {
+                this.selectedGroup.setGroupName(txtGrupNama.getText());
+                this.selectedGroup.setGroupCode(txtGrupKode.getText());
+                sms.getDB().updateGroup(selectedGroup);
+                refreshGroup();
+            } else {
+                JOptionPane.showMessageDialog(null, "Group name or code cannot be empty");
+            }
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUpdateGrupActionPerformed
+
+    private void tblGrupMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblGrupMousePressed
+        int row = tblGrup.getSelectedRow();
+        int id = Integer.valueOf(tblGrup.getValueAt(row, 0).toString());
+        this.selectedGroup = sms.getDB().getGroup(id);
+        if (this.selectedGroup != null) {
+            String nama = this.selectedGroup.getGroupName();
+            String kode = this.selectedGroup.getGroupCode();
+            txtGrupNama.setText(nama);
+            txtGrupKode.setText(kode);
+        }
+    }//GEN-LAST:event_tblGrupMousePressed
+
+    private void btnAddGrupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddGrupActionPerformed
+        if (!txtGrupNama.getText().isEmpty() && !txtGrupKode.getText().isEmpty()) {
+            KontakGroup g = new KontakGroup();
+            g.setGroupName(txtGrupNama.getText());
+            g.setGroupCode(txtGrupKode.getText());
+            sms.getDB().insertGroup(g);
+            refreshGroup();
+        } else {
+            JOptionPane.showMessageDialog(null, "Group name or code cannot be empty");
+        }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAddGrupActionPerformed
+
+    private void btnDeleteGrupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteGrupActionPerformed
+        if (this.selectedGroup != null) {
+            int opt = JOptionPane.showConfirmDialog(null, "Delete this grup?", "Confirmation", JOptionPane.YES_NO_OPTION);
+
+            switch (opt) {
+                case JOptionPane.YES_OPTION:
+                    sms.getDB().deleteGroup(selectedGroup);
+                    refreshGroup();
+                    break;
+            }
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnDeleteGrupActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -436,12 +640,16 @@ public class SmsGUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
+    private javax.swing.JButton btnAddGrup;
     private javax.swing.JButton btnAddKontak;
+    private javax.swing.JButton btnDeleteGrup;
     private javax.swing.JButton btnDeleteKontak;
     private javax.swing.JButton btnSend;
     private javax.swing.JButton btnStart;
     private javax.swing.JButton btnStop;
+    private javax.swing.JButton btnUpdateGrup;
     private javax.swing.JButton btnUpdateKontak;
+    private javax.swing.JComboBox<String> cbGrup;
     private javax.swing.JMenuItem contentsMenuItem;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
@@ -449,10 +657,15 @@ public class SmsGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblNomor;
+    private javax.swing.JLabel lblNomor1;
+    private javax.swing.JLabel lblNomor2;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openMenuItem;
@@ -462,7 +675,10 @@ public class SmsGUI extends javax.swing.JFrame {
     private javax.swing.JPanel pnlSendSMS;
     private javax.swing.JMenuItem saveAsMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
+    private javax.swing.JTable tblGrup;
     private javax.swing.JTable tblKontak;
+    private javax.swing.JTextField txtGrupKode;
+    private javax.swing.JTextField txtGrupNama;
     private javax.swing.JTextField txtKontakNama;
     private javax.swing.JTextField txtKontakNomor;
     private javax.swing.JTextField txtNomor;

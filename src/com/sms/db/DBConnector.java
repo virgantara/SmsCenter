@@ -9,7 +9,10 @@ import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 import com.sms.entity.Kontak;
 import com.sms.entity.KontakGroup;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.DriverManager;
@@ -18,6 +21,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -131,5 +136,177 @@ public class DBConnector {
         }
 
         return list;
+    }
+
+    public List<KontakGroup> getGroups() {
+
+        List<KontakGroup> list = new ArrayList<>();
+        if (connection != null) {
+            String query = "SELECT * FROM kontak_group";
+
+            PreparedStatement preparedStatement = null;
+
+            try {
+
+                preparedStatement = (PreparedStatement) connection.prepareStatement(query);
+
+                // execute select SQL stetement
+                ResultSet rs = preparedStatement.executeQuery();
+                int i = 0;
+                while (rs.next()) {
+                    i++;
+                    int id = rs.getInt("group_id");
+                    String nama = rs.getString("group_name");
+                    String code = rs.getString("group_code");
+
+                    KontakGroup k = new KontakGroup();
+                    k.setGroupId(id);
+                    k.setGroupName(nama);
+                    k.setGroupCode(code);
+
+                    list.add(k);
+                }
+
+            } catch (SQLException e) {
+
+                System.err.println(e.getMessage());
+
+            } finally {
+
+                if (preparedStatement != null) {
+                    try {
+                        preparedStatement.close();
+                    } catch (SQLException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+
+            }
+
+        }
+
+        return list;
+    }
+
+    public KontakGroup getGroup(int groupId) {
+
+        KontakGroup grup = null;
+        if (connection != null) {
+            String query = "SELECT * FROM kontak_group WHERE group_id = ?";
+
+            PreparedStatement preparedStatement = null;
+
+            try {
+
+                preparedStatement = (PreparedStatement) connection.prepareStatement(query);
+                preparedStatement.setInt(1, groupId);
+
+                // execute select SQL stetement
+                ResultSet rs = preparedStatement.executeQuery();
+
+                while (rs.next()) {
+                    int id = rs.getInt("group_id");
+                    String nama = rs.getString("group_name");
+                    String code = rs.getString("group_code");
+                    grup = new KontakGroup();
+                    grup.setGroupId(id);
+                    grup.setGroupName(nama);
+                    grup.setGroupCode(code);
+
+                }
+
+            } catch (SQLException e) {
+
+                System.err.println(e.getMessage());
+
+            } finally {
+
+                if (preparedStatement != null) {
+                    try {
+                        preparedStatement.close();
+                    } catch (SQLException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+
+            }
+
+        }
+
+        return grup;
+    }
+
+    public void updateGroup(KontakGroup grup) {
+
+        if (connection != null) {
+
+            try {
+
+                String query = "UPDATE kontak_group SET group_name = ?, group_code = ? "
+                        + "WHERE group_id = ?; ";
+
+                PreparedStatement preparedStmt = (PreparedStatement) connection.prepareStatement(query);
+                preparedStmt.setString(1, grup.getGroupName());
+                preparedStmt.setString(2, grup.getGroupCode());
+                preparedStmt.setInt(3, grup.getGroupId());
+                // execute the java preparedstatement
+                preparedStmt.executeUpdate();
+//                System.out.println("Affected Rows: " + preparedStmt.getUpdateCount());
+
+            } catch (SQLException ex) {
+
+            }
+
+        } else {
+            System.out.println("Failed to make connection!");
+        }
+
+    }
+
+    public void insertGroup(KontakGroup grup) {
+
+        if (connection != null) {
+
+            try {
+
+                String query = "INSERT INTO kontak_group (group_name, group_code) VALUES (?,?)";
+
+                PreparedStatement preparedStmt = (PreparedStatement) connection.prepareStatement(query);
+                preparedStmt.setString(1, grup.getGroupName());
+                preparedStmt.setString(2, grup.getGroupCode());
+                preparedStmt.executeUpdate();
+//                System.out.println("Affected Rows: " + preparedStmt.getUpdateCount());
+
+            } catch (SQLException ex) {
+
+            }
+
+        } else {
+            System.out.println("Failed to make connection!");
+        }
+
+    }
+
+    public void deleteGroup(KontakGroup grup) {
+
+        if (connection != null) {
+
+            try {
+
+                String query = "DELETE FROM kontak_group WHERE group_id = ?; ";
+
+                PreparedStatement preparedStmt = (PreparedStatement) connection.prepareStatement(query);
+                preparedStmt.setInt(1, grup.getGroupId());
+
+                preparedStmt.executeUpdate();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+
+        } else {
+            System.out.println("Failed to make connection!");
+        }
+
     }
 }
