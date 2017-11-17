@@ -27,6 +27,7 @@ public class Inbox implements IInboundMessageNotification {
     @Override
     public void process(AGateway gateway, Message.MessageTypes msgType, InboundMessage msg) {
         if (msgType == Message.MessageTypes.INBOUND) {
+            
             System.out.println(">>>Pesan masuk pada gateway/modem: " + gateway.getGatewayId());
         } else if (msgType == Message.MessageTypes.STATUSREPORT) {
             System.out.println(">>>Laporan pengiriman pesan dari gateway: " + gateway.getGatewayId());

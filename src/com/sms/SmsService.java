@@ -6,13 +6,12 @@
 package com.sms;
 
 import com.sms.db.DBConnector;
+import com.sms.utils.Format;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.smslib.AGateway;
 import org.smslib.AGateway.GatewayStatuses;
 import org.smslib.GatewayException;
@@ -28,13 +27,13 @@ import org.smslib.modem.SerialModemGateway;
  * @author ASUS
  */
 public class SmsService {
-
+    
     private SerialModemGateway gateway = null;
     Inbox inbox = null;
-
+    
     private GatewayStatuses status = null;
     private DBConnector db = null;
-
+    
     public SmsService() {
         try {
             loadConfig();
@@ -47,9 +46,9 @@ public class SmsService {
             //Setting notifikasi/pemberitahuan perubahan status gateway
             //Jika status gateway berubah, bisa jadi berhenti, eroor dll, maka class ini akan dijalankan
             GatewayNotification statusNotification = new GatewayNotification(this);
-
+            
             OrphanedNotification orphanedMessageNotification = new OrphanedNotification();
-
+            
             gateway.setProtocol(AGateway.Protocols.PDU);
 
             // menggunakan modem sebagai penerima pesan
@@ -73,16 +72,13 @@ public class SmsService {
             System.err.println(ex.getMessage());
         }
     }
-
+    
     public int sendMessage(String phone, String message) {
-
-        Pattern pattern = Pattern.compile("\\d{12}|\\d{11}");
-        Matcher matcher = pattern.matcher(phone);
-
+        
         int cond = 0;
-
-        boolean isValid = matcher.matches();
-
+        
+        boolean isValid = Format.cekPhoneFormat(phone);
+        
         try {
             if (!isValid) {
                 cond = 1;
@@ -90,20 +86,21 @@ public class SmsService {
                 cond = 2;
             } else {
                 OutboundMessage outmsg = new OutboundMessage(phone, message);
+                outmsg.setStatusReport(true);
                 Service.getInstance().sendMessage(outmsg);
             }
         } catch (TimeoutException | GatewayException | IOException | InterruptedException ex) {
             System.err.println(ex.getMessage());
         }
-
+        
         return cond;
     }
-
+    
     private void loadConfig() {
         Properties prop = new Properties();
         InputStream input = null;
         try {
-
+            
             input = new FileInputStream("config.properties");
 
             // load a properties file
@@ -115,7 +112,7 @@ public class SmsService {
             int baudrate = Integer.parseInt(prop.getProperty("baudrate"));
             String manufacturer = prop.getProperty("manufacturer");
             String model = prop.getProperty("model");
-
+            
             gateway = new SerialModemGateway(id, port, baudrate, manufacturer, model);
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
@@ -129,17 +126,17 @@ public class SmsService {
             }
         }
     }
-
+    
     public void stopService() {
         try {
-
+            
             Service.getInstance().stopService();
-
+            
         } catch (SMSLibException | IOException | InterruptedException ex) {
             System.err.println(ex.getMessage());
         }
     }
-
+    
     public void startService() {
         try {
             Service.getInstance().startService();
@@ -184,8 +181,8 @@ public class SmsService {
         this.status = status;
     }
     
-    public DBConnector getDB(){
+    public DBConnector getDB() {
         return this.db;
     }
-
+    
 }

@@ -8,21 +8,17 @@ package com.sms.db;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 import com.sms.entity.Kontak;
-import com.sms.entity.KontakGroup;
-import java.io.BufferedReader;
+import com.sms.entity.Group;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -88,9 +84,7 @@ public class DBConnector {
 
         List<Kontak> list = new ArrayList<>();
         if (connection != null) {
-            String query = "SELECT * "
-                    + " FROM kontak k "
-                    + " JOIN kontak_group kg ON k.contact_group = kg.group_id ";
+            String query = "SELECT * FROM kontak;";
 
             PreparedStatement preparedStatement = null;
 
@@ -106,13 +100,11 @@ public class DBConnector {
                     int id = rs.getInt("kontak_id");
                     String nama = rs.getString("contact_name");
                     String phone = rs.getString("contact_phone");
-                    String group = rs.getString("group_name");
 
                     Kontak k = new Kontak();
                     k.setKontakId(id);
                     k.setContactName(nama);
                     k.setContactPhone(phone);
-                    k.setContactGroup(group);
 
                     list.add(k);
                 }
@@ -138,11 +130,11 @@ public class DBConnector {
         return list;
     }
 
-    public List<KontakGroup> getGroups() {
+    public List<Group> getGroups() {
 
-        List<KontakGroup> list = new ArrayList<>();
+        List<Group> list = new ArrayList<>();
         if (connection != null) {
-            String query = "SELECT * FROM kontak_group";
+            String query = "SELECT * FROM `group`;";
 
             PreparedStatement preparedStatement = null;
 
@@ -159,7 +151,7 @@ public class DBConnector {
                     String nama = rs.getString("group_name");
                     String code = rs.getString("group_code");
 
-                    KontakGroup k = new KontakGroup();
+                    Group k = new Group();
                     k.setGroupId(id);
                     k.setGroupName(nama);
                     k.setGroupCode(code);
@@ -169,7 +161,7 @@ public class DBConnector {
 
             } catch (SQLException e) {
 
-                System.err.println(e.getMessage());
+                System.err.println("Function getGroups: "+e.getMessage());
 
             } finally {
 
@@ -188,11 +180,11 @@ public class DBConnector {
         return list;
     }
 
-    public KontakGroup getGroup(int groupId) {
+    public Group getGroup(int groupId) {
 
-        KontakGroup grup = null;
+        Group grup = null;
         if (connection != null) {
-            String query = "SELECT * FROM kontak_group WHERE group_id = ?";
+            String query = "SELECT * FROM `group` WHERE group_id = ?";
 
             PreparedStatement preparedStatement = null;
 
@@ -208,7 +200,7 @@ public class DBConnector {
                     int id = rs.getInt("group_id");
                     String nama = rs.getString("group_name");
                     String code = rs.getString("group_code");
-                    grup = new KontakGroup();
+                    grup = new Group();
                     grup.setGroupId(id);
                     grup.setGroupName(nama);
                     grup.setGroupCode(code);
@@ -217,7 +209,7 @@ public class DBConnector {
 
             } catch (SQLException e) {
 
-                System.err.println(e.getMessage());
+                System.err.println("Function getGroup line 212 : "+e.getMessage());
 
             } finally {
 
@@ -236,13 +228,13 @@ public class DBConnector {
         return grup;
     }
 
-    public void updateGroup(KontakGroup grup) {
+    public void updateGroup(Group grup) {
 
         if (connection != null) {
 
             try {
 
-                String query = "UPDATE kontak_group SET group_name = ?, group_code = ? "
+                String query = "UPDATE `group` SET group_name = ?, group_code = ? "
                         + "WHERE group_id = ?; ";
 
                 PreparedStatement preparedStmt = (PreparedStatement) connection.prepareStatement(query);
@@ -263,13 +255,13 @@ public class DBConnector {
 
     }
 
-    public void insertGroup(KontakGroup grup) {
+    public void insertGroup(Group grup) {
 
         if (connection != null) {
 
             try {
 
-                String query = "INSERT INTO kontak_group (group_name, group_code) VALUES (?,?)";
+                String query = "INSERT INTO group (group_name, group_code) VALUES (?,?)";
 
                 PreparedStatement preparedStmt = (PreparedStatement) connection.prepareStatement(query);
                 preparedStmt.setString(1, grup.getGroupName());
@@ -287,13 +279,13 @@ public class DBConnector {
 
     }
 
-    public void deleteGroup(KontakGroup grup) {
+    public void deleteGroup(Group grup) {
 
         if (connection != null) {
 
             try {
 
-                String query = "DELETE FROM kontak_group WHERE group_id = ?; ";
+                String query = "DELETE FROM `group` WHERE group_id = ?; ";
 
                 PreparedStatement preparedStmt = (PreparedStatement) connection.prepareStatement(query);
                 preparedStmt.setInt(1, grup.getGroupId());
@@ -308,5 +300,103 @@ public class DBConnector {
             System.out.println("Failed to make connection!");
         }
 
+    }
+
+    public void insertKontakGroup(Kontak k, Group grup) {
+
+        if (connection != null) {
+
+            try {
+                int id = this.insertKontak(k);
+                String query = "INSERT INTO kontak_group (kontak_id, group_id) VALUES (?,?)";
+
+                PreparedStatement preparedStmt = (PreparedStatement) connection.prepareStatement(query);
+                preparedStmt.setInt(1, id);
+                preparedStmt.setInt(2, grup.getGroupId());
+                preparedStmt.executeUpdate();
+
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+
+        } else {
+            System.out.println("Failed to make connection!");
+        }
+
+    }
+
+    private int insertKontak(Kontak k) throws SQLException {
+
+        if (connection != null) {
+
+            String query = "INSERT INTO kontak (contact_name, contact_phone) VALUES (?,?)";
+
+            PreparedStatement preparedStmt = (PreparedStatement) connection.prepareStatement(query,
+                    Statement.RETURN_GENERATED_KEYS);
+            preparedStmt.setString(1, k.getContactName());
+            preparedStmt.setString(2, k.getContactPhone());
+            preparedStmt.executeUpdate();
+
+            try (ResultSet generatedKeys = preparedStmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    k.setKontakId(generatedKeys.getInt(1));
+                } else {
+                    throw new SQLException("Creating Contact failed, no ID obtained.");
+                }
+            }
+
+        } else {
+            System.out.println("Failed to make connection!");
+        }
+
+        return k.getKontakId();
+    }
+
+    public Kontak getKontak(int kontakId) {
+
+        Kontak k = null;
+        if (connection != null) {
+            String query = "SELECT * FROM kontak WHERE kontak_id = ?";
+
+            PreparedStatement preparedStatement = null;
+
+            try {
+
+                preparedStatement = (PreparedStatement) connection.prepareStatement(query);
+                preparedStatement.setInt(1, kontakId);
+
+                // execute select SQL stetement
+                ResultSet rs = preparedStatement.executeQuery();
+
+                while (rs.next()) {
+                    int id = rs.getInt("kontak_id");
+                    String nama = rs.getString("contact_name");
+                    String phone = rs.getString("contact_phone");
+                    k = new Kontak();
+                    k.setKontakId(id);
+                    k.setContactName(nama);
+                    k.setContactPhone(phone);
+
+                }
+
+            } catch (SQLException e) {
+
+                System.err.println(e.getMessage());
+
+            } finally {
+
+                if (preparedStatement != null) {
+                    try {
+                        preparedStatement.close();
+                    } catch (SQLException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+
+            }
+
+        }
+
+        return k;
     }
 }

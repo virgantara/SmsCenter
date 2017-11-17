@@ -6,7 +6,9 @@
 package com.sms;
 
 import com.sms.entity.Kontak;
-import com.sms.entity.KontakGroup;
+import com.sms.entity.Group;
+import com.sms.utils.Format;
+import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -14,12 +16,16 @@ import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -31,7 +37,7 @@ public class SmsGUI extends javax.swing.JFrame {
     SmsService sms = null;
     ScheduledExecutorService exec = null;
 
-    KontakGroup selectedGroup = null;
+    Group selectedGroup = null;
     Kontak selectedContact = null;
 
     /**
@@ -66,8 +72,9 @@ public class SmsGUI extends javax.swing.JFrame {
         displayGroups(sms.getDB().getGroups());
     }
 
-    private void refreshGroup() {
+    private void refreshAll() {
         displayGroups(sms.getDB().getGroups());
+        displayContacts(sms.getDB().getKontaks());
     }
 
     public void displayContacts(List list) {
@@ -78,7 +85,6 @@ public class SmsGUI extends javax.swing.JFrame {
         tableHeaders.add("No");
         tableHeaders.add("Nama");
         tableHeaders.add("Nomor");
-        tableHeaders.add("Grup");
 
         for (Object obj : list) {
 
@@ -88,7 +94,6 @@ public class SmsGUI extends javax.swing.JFrame {
             row.add(mobiles.getKontakId());
             row.add(mobiles.getContactName());
             row.add(mobiles.getContactPhone());
-            row.add(mobiles.getContactGroup());
 
             tableData.add(row);
         }
@@ -97,24 +102,32 @@ public class SmsGUI extends javax.swing.JFrame {
 
     public void displayGroups(List list) {
         DefaultTableModel dtm = new DefaultTableModel();
+        DefaultComboBoxModel cbm = new DefaultComboBoxModel();
+        cbm.removeAllElements();
         dtm.setRowCount(0);
 
         dtm.addColumn("No");
         dtm.addColumn("Kode");
         dtm.addColumn("Nama");
+        cbm.addElement("Pilih grup");
 
         for (Object obj : list) {
 
-            KontakGroup grup = (KontakGroup) obj;
+            Group grup = (Group) obj;
+
+            cbm.addElement(grup);
+
             Vector<Object> row = new Vector<>();
 
             row.add(grup.getGroupId());
             row.add(grup.getGroupCode());
             row.add(grup.getGroupName());
             dtm.addRow(row);
-        }
 
+        }
+        cbGrup.setModel(cbm);
         tblGrup.setModel(dtm);
+
     }
 
     /**
@@ -240,11 +253,11 @@ public class SmsGUI extends javax.swing.JFrame {
 
             },
             new String [] {
-                "No", "Nama", "Nomor", "Grup"
+                "No", "Nama", "Nomor"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.String.class, java.lang.Object.class, java.lang.Object.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -261,6 +274,11 @@ public class SmsGUI extends javax.swing.JFrame {
         lblNomor.setText("Nomor :");
 
         btnAddKontak.setText("Add");
+        btnAddKontak.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddKontakActionPerformed(evt);
+            }
+        });
 
         btnUpdateKontak.setText("Update");
 
@@ -303,11 +321,11 @@ public class SmsGUI extends javax.swing.JFrame {
                 .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtKontakNama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblNomor)
                     .addComponent(txtKontakNomor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlContactsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNomor1)
                     .addComponent(cbGrup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -316,7 +334,7 @@ public class SmsGUI extends javax.swing.JFrame {
                     .addComponent(btnAddKontak)
                     .addComponent(btnUpdateKontak)
                     .addComponent(btnDeleteKontak))
-                .addContainerGap(276, Short.MAX_VALUE))
+                .addContainerGap(293, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Contacts", pnlContacts);
@@ -441,13 +459,13 @@ public class SmsGUI extends javax.swing.JFrame {
         pnlMainLayout.setHorizontalGroup(
             pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMainLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(18, 18, 18)
                 .addComponent(btnStart)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnStop)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(466, Short.MAX_VALUE))
+                .addContainerGap(458, Short.MAX_VALUE))
             .addGroup(pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMainLayout.createSequentialGroup()
                     .addContainerGap()
@@ -540,13 +558,13 @@ public class SmsGUI extends javax.swing.JFrame {
         int cond = sms.sendMessage(phone, msg);
         switch (cond) {
             case 1:
-                JOptionPane.showMessageDialog(null, "Invalid Phone Number");
+                JOptionPane.showMessageDialog(null, "Format Nomor salah");
                 break;
             case 2:
                 JOptionPane.showMessageDialog(null, "Service is not STARTED");
                 break;
             default:
-                JOptionPane.showMessageDialog(null, "Message Sent");
+                JOptionPane.showMessageDialog(null, "Pesan Terkirim");
                 break;
         }
 // TODO add your handling code here:
@@ -559,9 +577,9 @@ public class SmsGUI extends javax.swing.JFrame {
                 this.selectedGroup.setGroupName(txtGrupNama.getText());
                 this.selectedGroup.setGroupCode(txtGrupKode.getText());
                 sms.getDB().updateGroup(selectedGroup);
-                refreshGroup();
+                refreshAll();
             } else {
-                JOptionPane.showMessageDialog(null, "Group name or code cannot be empty");
+                JOptionPane.showMessageDialog(null, "Group name atau code tidak boleh kosong");
             }
         }
         // TODO add your handling code here:
@@ -581,13 +599,13 @@ public class SmsGUI extends javax.swing.JFrame {
 
     private void btnAddGrupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddGrupActionPerformed
         if (!txtGrupNama.getText().isEmpty() && !txtGrupKode.getText().isEmpty()) {
-            KontakGroup g = new KontakGroup();
+            Group g = new Group();
             g.setGroupName(txtGrupNama.getText());
             g.setGroupCode(txtGrupKode.getText());
             sms.getDB().insertGroup(g);
-            refreshGroup();
+            refreshAll();
         } else {
-            JOptionPane.showMessageDialog(null, "Group name or code cannot be empty");
+            JOptionPane.showMessageDialog(null, "Group name atau code tidak boleh kosong");
         }
 
         // TODO add your handling code here:
@@ -595,27 +613,57 @@ public class SmsGUI extends javax.swing.JFrame {
 
     private void btnDeleteGrupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteGrupActionPerformed
         if (this.selectedGroup != null) {
-            int opt = JOptionPane.showConfirmDialog(null, "Delete this grup?", "Confirmation", JOptionPane.YES_NO_OPTION);
+            int opt = JOptionPane.showConfirmDialog(null, "Hapus data grup ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
 
             switch (opt) {
                 case JOptionPane.YES_OPTION:
                     sms.getDB().deleteGroup(selectedGroup);
-                    refreshGroup();
+                    refreshAll();
                     break;
             }
         }
         // TODO add your handling code here:
     }//GEN-LAST:event_btnDeleteGrupActionPerformed
 
+    private void btnAddKontakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddKontakActionPerformed
+        if (!txtKontakNama.getText().isEmpty() && !txtKontakNomor.getText().isEmpty()) {
+            String phone = txtKontakNomor.getText();
+            if (Format.cekPhoneFormat(phone)) {
+                Kontak k = new Kontak();
+                k.setContactName(txtKontakNama.getText());
+                k.setContactPhone(phone);
+
+                Group g = (Group) cbGrup.getSelectedItem();
+                
+                if(g != null){
+                    sms.getDB().insertKontakGroup(k, g);
+                    refreshAll();
+                }
+                
+                else{
+                    JOptionPane.showMessageDialog(null, "Silakan pilih grup");
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Format nomor salah");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Kontak dan Nomor tidak boleh kosong");
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAddKontakActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+            * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
+//            javax.swing.UIManager.setLookAndFeel("window");
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -626,7 +674,7 @@ public class SmsGUI extends javax.swing.JFrame {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(SmsGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+//</editor-fold>
 
         //</editor-fold>
 
