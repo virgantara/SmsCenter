@@ -94,6 +94,8 @@ return array(
 			'oddy' => 'oddy@unida.gontor.ac.id',
 			
 		),
+
+		'basepath' => 'D:/gammu/bin',
 		// this is used in contact page
 		'adminEmail'=>'oddy@unida.gontor.ac.id',
 	),

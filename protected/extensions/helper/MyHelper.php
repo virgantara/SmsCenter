@@ -3,6 +3,35 @@
 class MyHelper extends CApplicationComponent
 {
 
+	function startGammu()
+	{
+		$fileGammu = "gammu-smsd.exe";
+        $gammuCommand = Yii::app()->params['basepath'] . "/" . $fileGammu . " -c smsdrc -s -n gammuku";
+        exec($gammuCommand,$respond);
+	}
+
+	function stopGammu()
+	{
+		$fileGammu = "gammu-smsd.exe";
+        $gammuCommand = Yii::app()->params['basepath'] . "/" . $fileGammu . " -c smsdrc -k -n gammuku";
+        exec($gammuCommand,$respond); 
+	}
+
+	function cekGammu()
+	{
+		exec("tasklist /fi \"Services eq gammuku\"",$respond); 
+		$is_exist = false;
+		foreach ($respond AS $t)
+		{
+		  	
+		  	$is_exist = Yii::app()->helper->contains($t,'gammu');
+		  	if($is_exist)
+		  		break;
+		}
+
+		return $is_exist;
+	}
+
 	function contains($haystack, $needle)
 	{
 		return strpos($haystack, $needle) !== false; 

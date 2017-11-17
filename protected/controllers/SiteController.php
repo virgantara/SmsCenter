@@ -2,6 +2,8 @@
 
 class SiteController extends Controller
 {
+
+	public $RUNNING_STATUS = "";
 	/**
 	 * Declares class-based actions.
 	 */
@@ -19,6 +21,37 @@ class SiteController extends Controller
 				'class'=>'CViewAction',
 			),
 		);
+	}
+
+	public function actionGetStatus()
+	{
+		echo Yii::app()->helper->cekGammu() ? 'RUNNING' : 'STOP';
+	}
+
+	public function actionSetting()
+	{
+		$this->render('setting');
+	}
+
+	public function actionStartService()
+	{
+
+		if(!Yii::app()->helper->cekGammu())
+		{
+			Yii::app()->helper->startGammu();
+		}
+
+		echo 'Service Started';
+        
+	}
+
+	public function actionStopService()
+	{
+		if(Yii::app()->helper->cekGammu())
+		{
+			Yii::app()->helper->stopGammu();
+			echo 'Service Stopped';
+		}
 	}
 
 	public function actionMaster()
