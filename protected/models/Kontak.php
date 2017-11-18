@@ -10,6 +10,10 @@
  */
 class Kontak extends CActiveRecord
 {
+
+	public $SEARCH;
+	public $PAGE_SIZE = 10;
+	
 	/**
 	 * @return string the associated database table name
 	 */
@@ -80,6 +84,28 @@ class Kontak extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchByGroup($group_id)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+		$sort = new CSort();
+		$criteria->join = 'JOIN kontak_group kg ON kg.kontak_id = t.kontak_id';
+		$criteria->addSearchCondition('t.contact_name',$this->SEARCH,true,'OR');
+		$criteria->addSearchCondition('t.contact_phone',$this->SEARCH,true,'OR');
+		$criteria->addCondition('kg.group_id='.$group_id);
+
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>$sort,
+			'pagination'=>array(
+				'pageSize'=>$this->PAGE_SIZE,
+				
+			),
 		));
 	}
 

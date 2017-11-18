@@ -21,17 +21,9 @@ $this->menu=array(
 <?php $this->widget('zii.widgets.CDetailView', array(
 	'data'=>$model,
 	'attributes'=>array(
-		'UpdatedInDB',
-		'ReceivingDateTime',
-		'Text',
 		'SenderNumber',
-		'Coding',
-		'UDH',
-		'SMSCNumber',
-		'Class',
+		
 		'TextDecoded',
-		'ID',
-		'RecipientID',
-		'Processed',
+		'ReceivingDateTime',
 	),
 )); ?>

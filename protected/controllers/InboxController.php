@@ -61,8 +61,11 @@ class InboxController extends Controller
 	 */
 	public function actionView($id)
 	{
+		$model = $this->loadModel($id);
+		$model->Processed = 'true';
+		$model->save(false,array('Processed'));
 		$this->render('view',array(
-			'model'=>$this->loadModel($id),
+			'model'=>$model,
 		));
 	}
 

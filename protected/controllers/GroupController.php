@@ -28,7 +28,7 @@ class GroupController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','create','update','admin','delete'),
+				'actions'=>array('index','view','create','update','admin','delete','removeKontak','ajaxAddToGroup'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -45,14 +45,63 @@ class GroupController extends Controller
 		);
 	}
 
+	public function actionAjaxAddToGroup()
+	{
+		if(Yii::app()->request->getIsAjaxRequest())
+        {
+        	$data = $_POST['data'];
+        	$gid = $_POST['gid'];
+        	$k = explode(',', $data);
+		// print_r($k);exit;
+			foreach($k as $d)
+			{
+
+				$kg = new KontakGroup;
+
+				$kg->kontak_id = $d;
+				$kg->group_id = $gid;
+				$kg->save();
+			}	
+
+        	$response = array(
+				'status' => 'Kontak telah disimpan',
+				// 'message' => $_POST['kontak']
+			);
+
+			echo json_encode($response);	
+        }
+	}
+
+	public function actionRemoveKontak()
+	{   
+		if(Yii::app()->request->getIsAjaxRequest())
+        {
+            $checkedIDs=$_GET['checked'];
+            foreach($checkedIDs as $id)
+            {
+            	$kg = KontakGroup::model()->findByAttributes(array('kontak_id'=>$id));
+                $kg->delete();
+            }
+        }
+	}
+
 	/**
 	 * Displays a particular model.
 	 * @param integer $id the ID of the model to be displayed
 	 */
 	public function actionView($id)
 	{
+		$kontak = new Kontak;
+
+		if(isset($_GET['filter']))
+			$kontak->SEARCH=$_GET['filter'];
+
+		if(isset($_GET['size']))
+			$kontak->PAGE_SIZE=$_GET['size'];
+
 		$this->render('view',array(
 			'model'=>$this->loadModel($id),
+			'kontak' => $kontak,
 		));
 	}
 

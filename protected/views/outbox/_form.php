@@ -75,7 +75,7 @@ $cs->registerScriptFile($baseUrl.'/js/jquery.multiplecombobox.min.js');
 				success : function(response){
 					var response = jQuery.parseJSON(response);
 					// console.log(response);
-					// alert(response.status);
+					alert(response.status);
 				},
 				
 			});
