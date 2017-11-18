@@ -7,6 +7,9 @@
  $cs = Yii::app()->getClientScript();
 
 $cs->registerCssFile('css/multiplecombobox-styles.css');
+
+$nomor_tujuan = !empty($model->DestinationNumber) ? $model->DestinationNumber : '';
+
 ?>
 
 <div class="form">
@@ -14,7 +17,7 @@ $cs->registerCssFile('css/multiplecombobox-styles.css');
 	Nomor : <br>
 	<small style="color: orange">Bila lebih dari satu nomor, pisahkan dengan tanda titik koma(;) </small>
 	<br>
-	<?php echo CHtml::textArea('nomor_tujuan','',array('rows'=>6, 'cols'=>50,'id'=>'nomor_tujuan')); ?>
+	<?php echo CHtml::textArea('nomor_tujuan',$nomor_tujuan,array('rows'=>6, 'cols'=>50,'id'=>'nomor_tujuan')); ?>
 	<br>
 
 	<div class="row">

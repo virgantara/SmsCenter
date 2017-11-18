@@ -7,10 +7,6 @@ $this->breadcrumbs=array(
 	'Manage',
 );
 
-$this->menu=array(
-	array('label'=>'List Inbox', 'url'=>array('index')),
-	array('label'=>'Create Inbox', 'url'=>array('create')),
-);
 
 Yii::app()->clientScript->registerScript('search', "
 $('.search-button').click(function(){
@@ -56,12 +52,7 @@ $('.search-form form').submit(function(){
  foreach(Yii::app()->user->getFlashes() as $key => $message) {
         echo '<div style="color:green">' . $message . "</div>\n";
     }
-    
-echo '<ul>';
-echo '<li>'.CHtml::link('Cetak Jadwal Personal',array('jadwal/cetakPerDosen'),array('target'=>'_blank')).'</li>';
-echo '<li>'.CHtml::link('Rekap Jadwal Per Prodi',array('jadwal/rekapJadwal'),array('target'=>'_blank')).'</li>';
-echo '<li>'.CHtml::link('Rekap Jadwal Semua Dosen',array('jadwal/rekapJadwalAll'),array('target'=>'_blank')).'</li>';
-echo '</ul>';
+
 ?>
  <div class="pull-right">
 Data per halaman
@@ -98,6 +89,15 @@ echo CHtml::button("Hapus Item Terpilih",array("id"=>"butt"));
                 ),
 		array(
 			'class'=>'CButtonColumn',
+			'template'=>'{view} {reply} {delete}',
+      		'buttons' => array(
+      			'reply' => array(
+      				'label'=>'Balas',
+                    'url'=>'Yii::app()->createUrl("outbox/instant", array("id"=>$data->ID))',
+                    'imageUrl'=>'images/reply.png',
+
+      			),
+      		),
 		),
 	),
 	'pager'=>array(

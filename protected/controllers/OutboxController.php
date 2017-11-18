@@ -45,10 +45,15 @@ class OutboxController extends Controller
 		);
 	}
 
-	public function actionInstant()
+	public function actionInstant($id='')
 	{
 		$model=new Outbox;
 
+		if(!empty($id))
+		{
+			$inbox = Inbox::model()->findByPk($id);
+			$model->DestinationNumber = $inbox->SenderNumber; 
+		}
 
 		$this->render('instant',array(
 			'model'=>$model,

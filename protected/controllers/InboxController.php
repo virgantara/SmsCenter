@@ -28,7 +28,7 @@ class InboxController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','removeSelected','admin','delete'),
+				'actions'=>array('index','view','removeSelected','admin','delete','countTotalUnread'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -43,6 +43,12 @@ class InboxController extends Controller
 				'users'=>array('*'),
 			),
 		);
+	}
+
+	public function actionCountTotalUnread()
+	{
+		echo Inbox::model()->countUnread();
+
 	}
 
 	public function actionRemoveSelected()

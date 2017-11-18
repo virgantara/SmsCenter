@@ -118,6 +118,13 @@ class Inbox extends CActiveRecord
 		));
 	}
 
+	public function countUnread()
+	{
+		$m = Inbox::model()->findAllByAttributes(array('Processed'=>'false'));
+
+		return count($m);
+	}
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
