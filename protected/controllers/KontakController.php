@@ -71,7 +71,20 @@ class KontakController extends Controller
 		{
 			$model->attributes=$_POST['Kontak'];
 			if($model->save())
+			{
+				$group = $_POST['group'];
+        	
+
+        		foreach($group as $g)
+        		{
+        			$kg = new KontakGroup;
+					$kg->kontak_id = $model->kontak_id;
+					$kg->group_id = $g;
+					$kg->save();
+        		}
+
 				$this->redirect(array('view','id'=>$model->kontak_id));
+			}
 		}
 
 		$this->render('create',array(
@@ -95,7 +108,24 @@ class KontakController extends Controller
 		{
 			$model->attributes=$_POST['Kontak'];
 			if($model->save())
+			{
+				$group = $_POST['group'];
+        
+        		$kg = KontakGroup::model()->findAllByAttributes(array('kontak_id'=>$id));
+        		foreach($kg as $g)
+        		{
+        			$g->delete();
+        		}
+
+        		foreach($group as $g)
+        		{
+        			$kg = new KontakGroup;
+					$kg->kontak_id = $model->kontak_id;
+					$kg->group_id = $g;
+					$kg->save();
+        		}
 				$this->redirect(array('view','id'=>$model->kontak_id));
+			}
 		}
 
 		$this->render('update',array(
@@ -110,6 +140,12 @@ class KontakController extends Controller
 	 */
 	public function actionDelete($id)
 	{
+		$kg = KontakGroup::model()->findAllByAttributes(array('kontak_id'=>$id));
+		foreach($kg as $k)
+		{
+			$k->delete();
+		}
+
 		$this->loadModel($id)->delete();
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser

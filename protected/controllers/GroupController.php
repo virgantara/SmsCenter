@@ -159,7 +159,17 @@ class GroupController extends Controller
 	 */
 	public function actionDelete($id)
 	{
+		$group = Group::model()->findByAttributes(array('group_code'=>'SMA'));
+
+		$kg = KontakGroup::model()->findAllByAttributes(array('group_id'=>$id));
+		foreach($kg as $k)
+		{
+			$k->group_id = $group->group_id;
+			$k->save(false,array('group_id'));
+		}
 		$this->loadModel($id)->delete();
+
+
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		if(!isset($_GET['ajax']))

@@ -2,6 +2,7 @@
 /* @var $this KontakController */
 /* @var $model Kontak */
 /* @var $form CActiveForm */
+
 ?>
 
 <div class="form">
@@ -31,6 +32,23 @@
 		<?php echo $form->error($model,'contact_phone'); ?>
 	</div>
 
+	<div class="row">
+		Ke grup : <br>
+		<?php 
+			$group = Group::model()->findAll();
+
+			foreach($group as $g)
+			{
+				$kg = KontakGroup::model()->findByAttributes(array('kontak_id'=>$model->kontak_id,'group_id'=>$g->group_id));
+
+				if(!empty($kg))
+					echo '<label><input type="checkbox" checked name="group[]" value="'.$g->group_id.'"> &nbsp;'.strtoupper($g->group_name).'</label>';
+				else
+					echo '<label><input type="checkbox" name="group[]" value="'.$g->group_id.'"> &nbsp;'.strtoupper($g->group_name).'</label>';
+			}
+		?>
+	</div>
+
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
 	</div>
@@ -38,3 +56,4 @@
 <?php $this->endWidget(); ?>
 
 </div><!-- form -->
+
