@@ -123,7 +123,7 @@ echo CHtml::button("Hapus Item Terpilih",array("id"=>"butt"));
 Yii::app()->clientScript->registerScript('delete','
 $("#butt").click(function(){
 
-        var checked=$("#inbox-grid").yiiGridView("getChecked","inbox-grid_c14"); 
+        var checked=$("#inbox-grid").yiiGridView("getChecked","inbox-grid_c4"); 
         var count=checked.length;
         if(count>0 && confirm("Do you want to delete these "+count+" item(s)"))
         {

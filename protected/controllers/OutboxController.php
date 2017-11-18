@@ -28,7 +28,7 @@ class OutboxController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','admin','delete','create','update','sent'),
+				'actions'=>array('index','view','admin','delete','create','update','sent','sendMessage','instant','ajaxInstant'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -43,6 +43,135 @@ class OutboxController extends Controller
 				'users'=>array('*'),
 			),
 		);
+	}
+
+	public function actionInstant()
+	{
+		$model=new Outbox;
+
+
+		$this->render('instant',array(
+			'model'=>$model,
+		));
+	}
+
+	public function actionAjaxInstant()
+	{
+		if(Yii::app()->request->isAjaxRequest)
+		{
+
+			if(isset($_POST['data']))
+			{
+
+				$data = $_POST['data'];
+
+				if(Yii::app()->helper->contains($data,';'))
+				{
+					$data = explode(';', $data);
+
+					foreach($data as $d)
+					{
+
+						$outbox = new Outbox;
+						$outbox->DestinationNumber = $d;
+						$outbox->TextDecoded = $_POST['msg'];
+						$outbox->save();
+					}	
+
+					
+				}
+
+				else
+				{
+					$outbox = new Outbox;
+					$outbox->DestinationNumber = $data;
+					$outbox->TextDecoded = $_POST['msg'];
+					$outbox->save();
+				}
+
+				
+
+				$response = array(
+					'status' => 'Pesan Terkirim',
+					// 'message' => $_POST['kontak']
+				);
+
+				echo json_encode($response);	
+			}
+		}
+	}
+
+	public function actionSendMessage()
+	{
+		if(Yii::app()->request->isAjaxRequest)
+		{
+
+			if(isset($_POST['data']))
+			{
+
+				$data = $_POST['data'];
+
+				$data = explode('#', $data);
+
+				// Send kontak
+				if(!empty($data[0]))
+				{
+					$k = $data[0];
+					$k = explode(',', $k);
+				// print_r($k);exit;
+					foreach($k as $d)
+					{
+
+						$kontak = Kontak::model()->findByPk($d);
+
+						if(!empty($kontak))
+						{
+							$outbox = new Outbox;
+							$outbox->DestinationNumber = $kontak->contact_phone;
+							$outbox->TextDecoded = $_POST['msg'];
+							$outbox->save();
+						}
+					}	
+
+				}
+
+				// send grup
+				if(!empty($data[1]))
+				{
+
+					$k = $data[1];
+					$k = explode(',', $k);
+					foreach($k as $d)
+					{
+					
+						$group = Group::model()->findByPk($d);
+
+						if(!empty($group))
+						{
+
+							$criteria=new CDbCriteria;
+							$criteria->join = 'JOIN kontak_group kg ON kg.kontak_id = t.kontak_id';
+							$criteria->addCondition('kg.group_id='.$group->group_id);
+							$model = Kontak::model()->findAll($criteria);	
+							foreach($model as $kontak)
+							{
+								$outbox = new Outbox;
+								$outbox->DestinationNumber = $kontak->contact_phone;
+								$outbox->TextDecoded = $_POST['msg'];
+								$outbox->save();
+							}
+						}
+						
+					}	
+				}
+				$response = array(
+					'status' => 'Pesan Terkirim',
+					// 'message' => $_POST['kontak']
+				);
+
+				echo json_encode($response);	
+			}
+		}
 	}
 
 	public function actionSent()

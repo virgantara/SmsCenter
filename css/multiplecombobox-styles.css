@@ -1,0 +1,90 @@
+/*
+Multiple Combo Box Example Stylesheets
+Plugin URI: http://multiple-combo-box.marekrocks.it
+Author: Marek Fajkus
+Author URI: http://marekrocks.it;
+Licence: MIT
+ */
+
+input[type="text"].txtbox {
+  color: #000;
+  height: 30px;
+  width: 210px;
+  font-size: 18px;
+  border: 1px solid #f0f0f0;
+  line-height: 30px;
+  padding-left: 10px;
+  outline: none;
+}
+.txtbox-btn {
+  font-size: 20px;
+  width: 30px;
+  height: 30px;
+  background: #c8c8c8;
+  border: 1px solid #c8c8c8;
+  text-align: center;
+  line-height: 30px;
+  color: #fff;
+  text-decoration: none;
+  display: block;
+}
+.multicombobox {
+  position: relative;
+  width: 250px;
+  height: 30px;
+}
+.multicombobox input[type="text"].txtbox {
+  position: absolute;
+}
+.multicombobox .txtbox-btn {
+  position: absolute;
+  right: 0;
+}
+.multicombobox + .multicombobox-options {
+  margin: 0;
+  padding: 0;
+  width: 250px;
+  position: absolute;
+  background: #c8c8c8;
+  z-index: 1000;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.multicombobox + .multicombobox-options li {
+  list-style: none;
+  display: table;
+  width: 100%;
+  height: 20px;
+  padding: 12px;
+  border-bottom: 1px solid #e2e2e2;
+  cursor: pointer;
+  margin: 0;
+}
+.multicombobox + .multicombobox-options li span {
+  display: table-cell;
+  vertical-align: middle;
+}
+.multicombobox + .multicombobox-options li.selected {
+  background-color: #e2e2e2;
+}
+.multicombobox-options + .selected-list {
+  margin: 0;
+  padding: 0;
+  width: 250px;
+}
+.multicombobox-options + .selected-list li {
+  list-style: none;
+  display: table;
+  width: 100%;
+  height: 50px;
+  padding: 12px;
+  border-bottom: 1px solid #e2e2e2;
+  cursor: pointer;
+}
+.multicombobox-options + .selected-list li span {
+  display: table-cell;
+  vertical-align: middle;
+}
+.multicombobox-options + .selected-list li.selected {
+  background-color: #e2e2e2;
+}

@@ -29,6 +29,7 @@
 	<div id="mainmenu">
 		<?php $this->widget('zii.widgets.CMenu',array(
 			'items'=>array(
+				array('label'=>'Instant SMS', 'url'=>array('/outbox/instant')),
 				array('label'=>'Sms Baru', 'url'=>array('/outbox/create')),
 				array('label'=>'Inbox', 'url'=>array('/inbox/index')),
 				array('label'=>'Outbox', 'url'=>array('/outbox/index')),

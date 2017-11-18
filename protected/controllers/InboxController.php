@@ -28,7 +28,7 @@ class InboxController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','removeSelected','admin'),
+				'actions'=>array('index','view','removeSelected','admin','delete'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -36,7 +36,7 @@ class InboxController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('delete'),
+				'actions'=>array(),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -51,7 +51,7 @@ class InboxController extends Controller
         {
             $checkedIDs=$_GET['checked'];
             foreach($checkedIDs as $id)
-                    Jadwal::model()->deleteByPk($id);
+                    Inbox::model()->deleteByPk($id);
         }
 	}
 

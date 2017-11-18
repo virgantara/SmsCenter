@@ -11,32 +11,10 @@ $cs->registerCssFile('css/multiplecombobox-styles.css');
 
 <div class="form">
 
-	Dari kontak : <br>
-	<select multiple name="kontak" id="kontak">
-		<?php 
-			$kontak = Kontak::model()->findAll();
-
-			foreach($kontak as $g)
-			{
-				echo '<option value="'.$g->kontak_id.'">'.strtoupper($g->contact_name).'</option>';
-			}
-		?>
-	</select>
+	Nomor : <br>
+	<small style="color: orange">Bila lebih dari satu nomor, pisahkan dengan tanda titik koma(;) </small>
 	<br>
-
-	Dari grup : <br>
-	<select multiple name="groups" id="groups">
-		<?php 
-			$group = Group::model()->findAll();
-
-			foreach($group as $g)
-			{
-				echo '<option value="'.$g->group_id.'">'.strtoupper($g->group_name).'</option>';
-			}
-		?>
-	</select>
-	
-	
+	<?php echo CHtml::textArea('nomor_tujuan','',array('rows'=>6, 'cols'=>50,'id'=>'nomor_tujuan')); ?>
 	<br>
 
 	<div class="row">
@@ -57,25 +35,22 @@ $cs->registerCssFile('css/multiplecombobox-styles.css');
 
 <?php 
 $cs->registerScriptFile($baseUrl.'/js/jquery.min.js');
-$cs->registerScriptFile($baseUrl.'/js/jquery-ui.min.js');
-$cs->registerScriptFile($baseUrl.'/js/jquery.multiplecombobox.min.js');
 ?>
 <script type="text/javascript">
 	$(document).ready(function(){
-		$( "#groups, #kontak" ).multicombobox();
 
 		$('#btnSend').on('click', function() {
-			var dataku = $( "#kontak" ).multicombobox('val')+'#'+$( "#groups" ).multicombobox('val');
+			var dataku = $('#nomor_tujuan').val();
 			$.ajax({
 				type : 'POST',
-				url : '<?php echo Yii::app()->createUrl('outbox/sendMessage');?>',
+				url : '<?php echo Yii::app()->createUrl('outbox/ajaxInstant');?>',
 				// dataType : 'json',
 				data : 'data='+dataku+'&msg='+$('#pesanarea').val(),
 				// contentType : 'application/json; charset=utf-8',
 				success : function(response){
 					var response = jQuery.parseJSON(response);
 					// console.log(response);
-					// alert(response.status);
+					alert(response.status);
 				},
 				
 			});
