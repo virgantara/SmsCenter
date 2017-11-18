@@ -79,7 +79,7 @@ echo CHtml::button("Hapus Item Terpilih",array("id"=>"butt"));
 		'DestinationNumber',
 		'SendingDateTime',
 		'TextDecoded',
-		
+		'Status',
 		
 		 array(
                 'class'=>'CCheckBoxColumn',  //Tambahkan kolom untuk checkbos.
@@ -87,6 +87,14 @@ echo CHtml::button("Hapus Item Terpilih",array("id"=>"butt"));
                 ),
 		array(
 			'class'=>'CButtonColumn',
+			'template'=>'{view} {delete}',
+			'buttons' => array(
+      			'delete' => array(
+      				'label'=>'Hapus',
+                    'url'=>'Yii::app()->createUrl("outbox/deleteSent", array("id"=>$data->ID))',
+                    
+      			),
+      		),
 		),
 	),
 	'pager'=>array(
@@ -112,13 +120,13 @@ echo CHtml::button("Hapus Item Terpilih",array("id"=>"butt"));
 Yii::app()->clientScript->registerScript('delete','
 $("#butt").click(function(){
 
-        var checked=$("#sent-grid").yiiGridView("getChecked","sent-grid_c14"); 
+        var checked=$("#sent-grid").yiiGridView("getChecked","sent-grid_c5"); 
         var count=checked.length;
         if(count>0 && confirm("Do you want to delete these "+count+" item(s)"))
         {
                 $.ajax({
                         data:{checked:checked},
-                        url:"'.CHtml::normalizeUrl(array('outbox/removeSelected')).'",
+                        url:"'.CHtml::normalizeUrl(array('outbox/removeSent')).'",
                         success:function(data){$("#sent-grid").yiiGridView("update",{});},              
                 });
         }

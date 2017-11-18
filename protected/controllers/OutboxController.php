@@ -28,7 +28,7 @@ class OutboxController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','admin','delete','create','update','sent','sendMessage','instant','ajaxInstant'),
+				'actions'=>array('index','view','admin','delete','create','update','sent','sendMessage','instant','ajaxInstant','deleteSent','removeSent'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -44,6 +44,30 @@ class OutboxController extends Controller
 			),
 		);
 	}
+
+	public function actionRemoveSent()
+	{
+		if(Yii::app()->request->getIsAjaxRequest())
+        {
+            $checkedIDs=$_GET['checked'];
+            foreach($checkedIDs as $id){
+            	$model = Sentitems::model()->findByAttributes(array('ID'=>$id));
+            	$model->delete();
+            }
+                    
+        }
+	}
+
+	public function actionDeleteSent($id)
+	{
+		$model = Sentitems::model()->findByAttributes(array('ID'=>$id));
+		$model->delete();
+
+		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+		if(!isset($_GET['ajax']))
+			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+	}
+
 
 	public function actionInstant($id='')
 	{

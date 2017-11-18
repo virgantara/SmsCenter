@@ -138,6 +138,13 @@ class Outbox extends CActiveRecord
 	protected function beforeSave()
 	{
 		$this->CreatorID = '-';
+		// 628579022440
+		if(strlen($this->DestinationNumber) > 12)
+		{
+			$this->DestinationNumber = substr($this->DestinationNumber, 3);
+			$this->DestinationNumber = '0'.$this->DestinationNumber;
+		}
+
 		return parent::beforeSave();
 	}
 

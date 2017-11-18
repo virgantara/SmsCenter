@@ -65,8 +65,25 @@ Phone : (+62352) 483762, Fax : (+62352) 488182, Email : rektorat@unida.gontor.ac
 
 </body>
 <script type="text/javascript">
+
+	function playSound(){
+	    var audio = new Audio('<?php echo Yii::app()->baseUrl;?>/sounds/notif.mp3');
+	    audio.play();
+	}
+
+	function updateNotif(){
+		$.ajax({
+		 	type : 'POST',
+		 	url : '<?php echo Yii::app()->createUrl('site/ajaxUpdateNotif');?>',
+		 	success : function(data){
+		 		
+		 	}
+		});
+	}
+
+
 	setInterval(function(){ 
-		 $.ajax({
+		$.ajax({
 		 	type : 'POST',
 		 	url : '<?php echo Yii::app()->createUrl('inbox/countTotalUnread');?>',
 		 	success : function(data){
@@ -77,7 +94,20 @@ Phone : (+62352) 483762, Fax : (+62352) 488182, Email : rektorat@unida.gontor.ac
 		 		else
 		 			$('#unread').html('');
 		 	}
-		 });
+		});
+
+		$.ajax({
+		 	type : 'POST',
+		 	url : '<?php echo Yii::app()->createUrl('site/checkNotif');?>',
+		 	success : function(data){
+		 		var idx = eval(data);
+		 		if(idx == 1){
+		 			playSound();
+		 			updateNotif();
+		 		}
+		 		
+		 	}
+		});
 	}, 1000);
 </script>
 </html>

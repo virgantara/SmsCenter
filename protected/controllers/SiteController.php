@@ -23,6 +23,35 @@ class SiteController extends Controller
 		);
 	}
 
+	public function actionCheckNotif()
+	{
+		if(Yii::app()->request->getIsAjaxRequest())
+        {
+        	$new_notif = 0;
+        	$criteria=new CDbCriteria;
+			$criteria->addCondition('notif_count <> 0');
+        	$notif = Notification::model()->find($criteria);
+        	if(!empty($notif)){
+        		$new_notif = 1;
+        	}
+
+        	echo $new_notif;
+        }
+	}
+
+	public function actionAjaxUpdateNotif()
+	{
+		if(Yii::app()->request->getIsAjaxRequest())
+        {
+        	$criteria=new CDbCriteria;
+			$criteria->addCondition('notif_count <> 0');
+        	$notif = Notification::model()->find($criteria);
+        	if(!empty($notif)){
+        		$notif->delete();
+        	}
+        }
+	}
+
 	public function actionGetStatus()
 	{
 		echo Yii::app()->helper->cekGammu() ? 'RUNNING' : 'STOP';
