@@ -8,11 +8,9 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'List Inbox', 'url'=>array('index')),
-	array('label'=>'Create Inbox', 'url'=>array('create')),
-	array('label'=>'Update Inbox', 'url'=>array('update', 'id'=>$model->ID)),
-	array('label'=>'Delete Inbox', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->ID),'confirm'=>'Are you sure you want to delete this item?')),
-	array('label'=>'Manage Inbox', 'url'=>array('admin')),
+	array('label'=>'Balas Pesan', 'url'=>array('outbox/instant','id'=>$model->ID)),
+	array('label'=>'Hapus Pesan', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->ID),'confirm'=>'Are you sure you want to delete this item?')),
+	array('label'=>'Manage Pesan', 'url'=>array('admin')),
 );
 ?>
 

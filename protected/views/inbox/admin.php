@@ -66,6 +66,8 @@ echo CHtml::button("Cari",array("id"=>"pencarian"));
 </div> 
 <?php
 echo CHtml::button("Hapus Item Terpilih",array("id"=>"butt"));
+echo ' ';
+echo CHtml::button("Tandai sbg Terbaca",array("id"=>"read"));
 ?>
 <?php $this->widget('application.components.ComplexGridView', array(
 	'id'=>'inbox-grid',
@@ -133,6 +135,20 @@ $("#butt").click(function(){
                         success:function(data){$("#inbox-grid").yiiGridView("update",{});},              
                 });
         }
-        });
+});
+
+$("#read").click(function(){
+
+        var checked=$("#inbox-grid").yiiGridView("getChecked","inbox-grid_c4"); 
+        var count=checked.length;
+        if(count>0 && confirm("Tandai sbg terbaca "+count+" item(s)"))
+        {
+                $.ajax({
+                        data:{checked:checked},
+                        url:"'.CHtml::normalizeUrl(array('inbox/markAsRead')).'",
+                        success:function(data){$("#inbox-grid").yiiGridView("update",{});},              
+                });
+        }
+});
 ');
 ?>

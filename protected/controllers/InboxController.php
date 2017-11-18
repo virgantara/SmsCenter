@@ -28,7 +28,7 @@ class InboxController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','removeSelected','admin','delete','countTotalUnread'),
+				'actions'=>array('index','view','removeSelected','admin','delete','countTotalUnread','markAsRead'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -50,6 +50,21 @@ class InboxController extends Controller
 		echo Inbox::model()->countUnread();
 
 	}
+
+	public function actionMarkAsRead()
+	{   
+		if(Yii::app()->request->getIsAjaxRequest())
+        {
+            $checkedIDs=$_GET['checked'];
+            foreach($checkedIDs as $id){
+            	$inbox = $this->loadModel($id);
+            	$inbox->Processed = 'true';
+            	$inbox->save(false, array('Processed'));
+            }
+                    
+        }
+	}
+
 
 	public function actionRemoveSelected()
 	{   
