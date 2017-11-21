@@ -152,3 +152,21 @@ $("#read").click(function(){
 });
 ');
 ?>
+<script type="text/javascript">
+
+    setInterval(function(){ 
+        $.ajax({
+            type : 'POST',
+            url : '<?php echo Yii::app()->createUrl('site/checkNotif');?>',
+            success : function(data){
+               var hsl = jQuery.parseJSON(data);
+
+		 		var idx = eval(hsl.newNotif);
+		 		if(idx == 1){
+					updateData();
+		 		}
+                
+            }
+        });
+    },3000);
+</script>

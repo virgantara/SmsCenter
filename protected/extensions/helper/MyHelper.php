@@ -11,7 +11,24 @@ class MyHelper extends CApplicationComponent
 	    return $text;
 	}
 
+	function cekPulsa($nomor)
+	{
+		$fileGammu = "gammu.exe";
+        $gammuCommand = Yii::app()->params['basepath'] . "/" . $fileGammu . " -c ".Yii::app()->params['basepath']."/gammurc getussd ".$nomor;
+        exec($gammuCommand,$hasil);
+        // proses filter hasil output
+		$result ='';
+		for ($i=0; $i<=count($hasil)-1; $i++)
+		{
+			$result .= $hasil[$i];
+		   //if (substr_count($hasil[$i], 'Service reply') > 0) $index = $i;
+		}
 
+		// menampilkan sisa pulsa
+		return $result;
+
+        // return $respond;
+	}
 
 	function startGammu()
 	{

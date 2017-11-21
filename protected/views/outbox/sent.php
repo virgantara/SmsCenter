@@ -7,10 +7,7 @@ $this->breadcrumbs=array(
 	'Manage',
 );
 
-$this->menu=array(
-	array('label'=>'List Sent', 'url'=>array('index')),
-	
-);
+
 
 Yii::app()->clientScript->registerScript('search', "
 $('.search-button').click(function(){

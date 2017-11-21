@@ -8,12 +8,6 @@ $this->breadcrumbs=array(
 	'Update',
 );
 
-$this->menu=array(
-	array('label'=>'List Outbox', 'url'=>array('index')),
-	array('label'=>'Create Outbox', 'url'=>array('create')),
-	array('label'=>'View Outbox', 'url'=>array('view', 'id'=>$model->ID)),
-	array('label'=>'Manage Outbox', 'url'=>array('admin')),
-);
 ?>
 
 <h1>Update Outbox <?php echo $model->ID; ?></h1>

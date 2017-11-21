@@ -23,19 +23,51 @@ class SiteController extends Controller
 		);
 	}
 
+	public function actionCekPulsa()
+	{
+
+		$hasil = '';
+		if(!empty($_POST['nomor']))
+		{
+			$hasil = Yii::app()->helper->cekPulsa($_POST['nomor']);
+		}
+
+		$this->render('cekpulsa',array(
+			'hasil' => $hasil
+		));
+	}
+
+
+	// public function actionCekPulsa()
+	// {
+	// 	if(Yii::app()->request->getIsAjaxRequest())
+ //        {
+ //        	$nomor = $_POST['nomor'];
+ //        	$response = Yii::app()->helper->cekPulsa($nomor);
+
+	// 		echo $response;
+ //        }
+	// }
+
 	public function actionCheckNotif()
 	{
 		if(Yii::app()->request->getIsAjaxRequest())
         {
+        	$result = array();
         	$new_notif = 0;
         	$criteria=new CDbCriteria;
 			$criteria->addCondition('notif_count <> 0');
         	$notif = Notification::model()->find($criteria);
         	if(!empty($notif)){
         		$new_notif = 1;
+        		$notif->delete();
         	}
 
-        	echo $new_notif;
+        	$result = array(
+        		'newNotif' => $new_notif,
+        		'totalUnread' => Inbox::model()->countUnread()
+        	);
+        	echo json_encode($result);
         }
 	}
 
@@ -43,6 +75,8 @@ class SiteController extends Controller
 	{
 		if(Yii::app()->request->getIsAjaxRequest())
         {
+
+
         	$criteria=new CDbCriteria;
 			$criteria->addCondition('notif_count <> 0');
         	$notif = Notification::model()->find($criteria);

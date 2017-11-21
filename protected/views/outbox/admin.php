@@ -7,10 +7,6 @@ $this->breadcrumbs=array(
 	'Manage',
 );
 
-$this->menu=array(
-	array('label'=>'List Outbox', 'url'=>array('index')),
-	array('label'=>'Create Outbox', 'url'=>array('create')),
-);
 
 Yii::app()->clientScript->registerScript('search', "
 $('.search-button').click(function(){
@@ -25,6 +21,14 @@ $('.search-form form').submit(function(){
 });
 ");
 ?>
+<script type="text/javascript">
+	function updateData(){
+		 $('#outbox-grid').yiiGridView.update('outbox-grid', {
+            url:'?r=outbox/admin' 
+        });
+	}
+</script>
+
 
 <h1>Outboxes</h1>
 
@@ -55,3 +59,9 @@ $('.search-form form').submit(function(){
 	
 	),
 )); ?>
+
+<script type="text/javascript">
+    setInterval(function(){ 
+        updateData();
+    },3000);
+</script>

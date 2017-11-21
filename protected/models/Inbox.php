@@ -22,6 +22,9 @@ class Inbox extends CActiveRecord
 
 	public $SEARCH;
 	public $PAGE_SIZE = 10;
+	public $PENGIRIM = '';
+
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -134,5 +137,25 @@ class Inbox extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	protected function afterFind()
+	{
+		$criteria=new CDbCriteria;
+		// 628579022440
+		if(strlen($this->SenderNumber) > 12)
+		{
+			$this->SenderNumber = substr($this->SenderNumber, 3);
+			$this->SenderNumber = '0'.$this->SenderNumber;
+		}
+
+		$criteria->addSearchCondition('contact_phone',$this->SenderNumber,true,'OR');
+
+		$model = Kontak::model()->find($criteria);
+
+		if(!empty($model))
+			$this->SenderNumber = $model->contact_name;
+
+		return parent::afterFind();
 	}
 }

@@ -74,15 +74,15 @@ class Outbox extends CActiveRecord
 		return array(
 			'UpdatedInDB' => 'Updated In Db',
 			'InsertIntoDB' => 'Insert Into Db',
-			'SendingDateTime' => 'Sending Date Time',
+			'SendingDateTime' => 'Waktu Pengiriman',
 			'SendBefore' => 'Send Before',
 			'SendAfter' => 'Send After',
 			'Text' => 'Text',
-			'DestinationNumber' => 'Destination Number',
+			'DestinationNumber' => 'Nomor Tujuan',
 			'Coding' => 'Coding',
 			'UDH' => 'Udh',
 			'Class' => 'Class',
-			'TextDecoded' => 'Text Decoded',
+			'TextDecoded' => 'Pesan',
 			'ID' => 'ID',
 			'MultiPart' => 'Multi Part',
 			'RelativeValidity' => 'Relative Validity',
@@ -138,15 +138,12 @@ class Outbox extends CActiveRecord
 	protected function beforeSave()
 	{
 		$this->CreatorID = '-';
-		// 628579022440
-		if(strlen($this->DestinationNumber) > 12)
-		{
-			$this->DestinationNumber = substr($this->DestinationNumber, 3);
-			$this->DestinationNumber = '0'.$this->DestinationNumber;
-		}
+		$this->MultiPart = 'true';
 
 		return parent::beforeSave();
 	}
+
+	
 
 	/**
 	 * Returns the static model of the specified AR class.

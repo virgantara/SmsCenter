@@ -1,0 +1,15 @@
+[gammu]
+port = com3:
+connection = at115200
+ 
+[smsd]
+#PIN = 1234
+service = mysql
+user = root
+#password =
+pc = localhost
+database =unidagon_gammusms
+debuglevel = 0
+commtimeout = 30
+sendtimeout = 30
+driver = mysql

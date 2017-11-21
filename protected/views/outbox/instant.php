@@ -44,14 +44,23 @@ $cs->registerScriptFile($baseUrl.'/js/jquery.min.js');
 
 		$('#btnSend').on('click', function() {
 			var dataku = $('#nomor_tujuan').val();
+			dataku = dataku.split(";");
+			
+			var dataObj = new Object();
+			dataObj.phones = dataku;
+			dataObj.message = $('#pesanarea').val();
+
+			var dataJson = JSON.parse(JSON.stringify(dataObj));
+
+
 			$.ajax({
 				type : 'POST',
 				url : '<?php echo Yii::app()->createUrl('outbox/ajaxInstant');?>',
-				// dataType : 'json',
-				data : 'data='+dataku+'&msg='+$('#pesanarea').val(),
-				// contentType : 'application/json; charset=utf-8',
+				dataType : 'json',
+				data : dataJson,
+
 				success : function(response){
-					var response = jQuery.parseJSON(response);
+					// var response = jQuery.parseJSON(response);
 					// console.log(response);
 					alert(response.status);
 				},

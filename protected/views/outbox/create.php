@@ -7,10 +7,6 @@ $this->breadcrumbs=array(
 	'Create',
 );
 
-$this->menu=array(
-	array('label'=>'List Outbox', 'url'=>array('index')),
-	array('label'=>'Manage Outbox', 'url'=>array('admin')),
-);
 ?>
 
 <h1>Pesan Baru</h1>

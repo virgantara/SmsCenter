@@ -34,11 +34,11 @@ return array(
 	// application components
 	'components'=>array(
 
-		'user'=>array(
-			// enable cookie-based authentication
-			'class' => 'WebUser',
-			'allowAutoLogin'=>true,
-		),
+		// 'user'=>array(
+		// 	// enable cookie-based authentication
+		// 	'class' => 'WebUser',
+		// 	'allowAutoLogin'=>true,
+		// ),
 
 		'excel'=>array(
 	      	'class'=>'application.extensions.PHPExcel',
@@ -95,7 +95,7 @@ return array(
 			
 		),
 
-		'basepath' => 'D:/gammu/bin',
+		'basepath' => 'D:/xampp/htdocs/smscenter/gammu/bin',
 		// this is used in contact page
 		'adminEmail'=>'oddy@unida.gontor.ac.id',
 	),

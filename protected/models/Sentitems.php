@@ -78,15 +78,15 @@ class Sentitems extends CActiveRecord
 		return array(
 			'UpdatedInDB' => 'Updated In Db',
 			'InsertIntoDB' => 'Insert Into Db',
-			'SendingDateTime' => 'Sending Date Time',
-			'DeliveryDateTime' => 'Delivery Date Time',
+			'SendingDateTime' => 'Waktu Pengiriman',
+			'DeliveryDateTime' => 'Waktu Terkirim',
 			'Text' => 'Text',
-			'DestinationNumber' => 'Destination Number',
+			'DestinationNumber' => 'Nomor Tujuan',
 			'Coding' => 'Coding',
 			'UDH' => 'Udh',
 			'SMSCNumber' => 'Smscnumber',
 			'Class' => 'Class',
-			'TextDecoded' => 'Text Decoded',
+			'TextDecoded' => 'Pesan',
 			'ID' => 'ID',
 			'SenderID' => 'Sender',
 			'SequencePosition' => 'Sequence Position',
@@ -132,6 +132,25 @@ class Sentitems extends CActiveRecord
 				
 			),
 		));
+	}
+
+	protected function afterFind()
+	{
+		$criteria=new CDbCriteria;
+		// 628579022440
+		if(strlen($this->DestinationNumber) > 12)
+		{
+			$this->DestinationNumber = substr($this->DestinationNumber, 3);
+		}
+
+		$criteria->addSearchCondition('contact_phone',$this->DestinationNumber,true,'OR');
+
+		$model = Kontak::model()->find($criteria);
+
+		if(!empty($model))
+			$this->DestinationNumber = $model->contact_name;
+
+		return parent::afterFind();
 	}
 
 	/**

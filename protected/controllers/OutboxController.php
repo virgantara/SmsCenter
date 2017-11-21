@@ -89,35 +89,20 @@ class OutboxController extends Controller
 		if(Yii::app()->request->isAjaxRequest)
 		{
 
-			if(isset($_POST['data']))
+			// print_r($_POST['phones']);exit;
+			if(isset($_POST['phones']))
 			{
 
-				$data = $_POST['data'];
+				$phones = $_POST['phones'];
+				$message = $_POST['message'];
 
-				if(Yii::app()->helper->contains($data,';'))
-				{
-					$data = explode(';', $data);
-
-					foreach($data as $d)
-					{
-
-						$outbox = new Outbox;
-						$outbox->DestinationNumber = $d;
-						$outbox->TextDecoded = $_POST['msg'];
-						$outbox->save();
-					}	
-
-					
-				}
-
-				else
+				foreach($phones as $phone)
 				{
 					$outbox = new Outbox;
-					$outbox->DestinationNumber = $data;
-					$outbox->TextDecoded = $_POST['msg'];
+					$outbox->DestinationNumber = $phone;
+					$outbox->TextDecoded = $message;
 					$outbox->save();
 				}
-
 				
 
 				$response = array(

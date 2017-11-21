@@ -42,6 +42,7 @@ $unread = $unread >= 1 ? ' ('.$unread.')' : '';
 				array('label'=>'Pesan Terkirim', 'url'=>array('/outbox/sent')),
 				array('label'=>'Kontak', 'url'=>array('/kontak/index')),
 				array('label'=>'Grup', 'url'=>array('/group/index')),
+				array('label'=>'Cek Pulsa', 'url'=>array('/site/cekPulsa')),
 				array('label'=>'Setting', 'url'=>array('/site/setting')),
 			),
 		)); ?>
@@ -71,43 +72,31 @@ Phone : (+62352) 483762, Fax : (+62352) 488182, Email : rektorat@unida.gontor.ac
 	    audio.play();
 	}
 
-	function updateNotif(){
-		$.ajax({
-		 	type : 'POST',
-		 	url : '<?php echo Yii::app()->createUrl('site/ajaxUpdateNotif');?>',
-		 	success : function(data){
-		 		
-		 	}
-		});
-	}
-
-
 	setInterval(function(){ 
-		$.ajax({
-		 	type : 'POST',
-		 	url : '<?php echo Yii::app()->createUrl('inbox/countTotalUnread');?>',
-		 	success : function(data){
-		 		var total = eval(data);
-
-		 		if(total >= 1)
-		 			$('#unread').html(' ('+total+')');
-		 		else
-		 			$('#unread').html('');
-		 	}
-		});
+	
 
 		$.ajax({
 		 	type : 'POST',
 		 	url : '<?php echo Yii::app()->createUrl('site/checkNotif');?>',
 		 	success : function(data){
-		 		var idx = eval(data);
+
+		 		var hsl = jQuery.parseJSON(data);
+
+		 		var idx = eval(hsl.newNotif);
 		 		if(idx == 1){
 		 			playSound();
-		 			updateNotif();
+		 			// updateNotif();
 		 		}
+
+		 		var total = eval(hsl.totalUnread);
+
+		 		if(total >= 1)
+		 			$('#unread').html(' ('+total+')');
+		 		else
+		 			$('#unread').html('');
 		 		
 		 	}
 		});
-	}, 1000);
+	}, 3000);
 </script>
 </html>

@@ -15,7 +15,7 @@ $this->breadcrumbs=array(
 <div class="form">
 
 Gammu Service Status : 
-<div id="status" style="text-align: center;padding-top: 15px;padding-bottom: 15px"></div>
+<div id="status" style="text-align: center;padding-top: 15px;padding-bottom: 15px;width: 10%"></div>
 
 <button id="btnStart">Start</button>
 <button id="btnStop">Stop</button>
@@ -29,6 +29,29 @@ Gammu Service Status :
 $cs->registerScriptFile($baseUrl.'/js/jquery.min.js');
 ?>
 <script type="text/javascript">
+
+	// $('#btnCek').click(function(){
+
+	// 	var dataObj = new Object();
+	// 	dataObj.nomor = $('#cek_pulsa').val();
+
+	// 	var dataJson = JSON.parse(JSON.stringify(dataObj));
+
+	// 	$.ajax({
+	// 		type : 'POST',
+	// 		url : '<?php echo Yii::app()->createUrl('site/cekPulsa');?>',
+	// 		dataType : 'json',
+	// 		data : dataJson,
+	// 		beforeSend : function(){
+	// 			$('#hasil_cek').val('');
+	// 			$('#loading').show();
+	// 		},
+	// 		success : function(data){
+	// 			$('#loading').hide();
+	// 		 	$('#hasil_cek').val(data);
+	// 		}
+	// 	});
+	// });
 
 	$('#btnStart').click(function(){
 		$.ajax({
