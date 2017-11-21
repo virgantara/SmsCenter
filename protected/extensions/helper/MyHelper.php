@@ -3,7 +3,48 @@
 class MyHelper extends CApplicationComponent
 {
 
+	function generateMultipartMessage($pesan)
+	{
+		
+		$jmlSMS = ceil(strlen($pesan)/153);
 
+		$pecah  = str_split($pesan, 153);
+
+		$query = "SHOW TABLE STATUS LIKE 'outbox';";
+
+		$sql=$query;
+		$connection=Yii::app()->db;
+		$command=$connection->createCommand($sql);
+
+		$data=$command->queryRow();
+		
+		$newID = $data['Auto_increment'];
+
+		$listudh = array();
+
+		for ($i=1; $i<=$jmlSMS; $i++)
+		{
+		   // membuat UDH untuk setiap pecahan, sesuai urutannya
+		   $udh = "050003A7".sprintf("%02s", $jmlSMS).sprintf("%02s", $i);
+
+		   $msg = $pecah[$i-1];
+		   $listudh[] = array(
+		   		'urutan' => $i,
+		   		'UDH' => $udh,
+		   		'msg' => $msg
+		   );
+		}
+
+		$result = array(
+			'ID' => $newID,
+			'totalSms' => $jmlSMS,
+			'listudh' => $listudh,
+			'isMultipart' => $jmlSMS > 1
+		);
+
+		return $result;
+		
+	}
 
 	function remove_prefix($text, $prefix) {
 	    if(0 === strpos($text, $prefix))

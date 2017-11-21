@@ -51,8 +51,8 @@ class SiteController extends Controller
 
 	public function actionCheckNotif()
 	{
-		if(Yii::app()->request->getIsAjaxRequest())
-        {
+		// if(Yii::app()->request->getIsAjaxRequest())
+  //       {
         	$result = array();
         	$new_notif = 0;
         	$criteria=new CDbCriteria;
@@ -65,10 +65,10 @@ class SiteController extends Controller
 
         	$result = array(
         		'newNotif' => $new_notif,
-        		'totalUnread' => Inbox::model()->countUnread()
+        		'totalUnread' => Inbox::model()->countUnread(),
         	);
         	echo json_encode($result);
-        }
+        // }
 	}
 
 	public function actionAjaxUpdateNotif()

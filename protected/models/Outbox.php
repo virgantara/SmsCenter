@@ -137,8 +137,6 @@ class Outbox extends CActiveRecord
 
 	protected function beforeSave()
 	{
-		$this->CreatorID = '-';
-		$this->MultiPart = 'true';
 
 		return parent::beforeSave();
 	}
