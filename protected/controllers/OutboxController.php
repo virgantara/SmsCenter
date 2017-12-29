@@ -181,6 +181,7 @@ class OutboxController extends Controller
 							$multiparts = Yii::app()->helper->generateMultipartMessage($_POST['msg']);
 							$phone = $kontak->contact_phone;
 							$ID = $multiparts['ID'];
+							$pesan = $_POST['msg'];
 							if($multiparts['isMultipart'])
 							{
 								foreach($multiparts['listudh'] as $udh)
@@ -215,7 +216,7 @@ class OutboxController extends Controller
 							{
 								$outbox = new Outbox;
 								$outbox->DestinationNumber = $phone;
-								$outbox->TextDecoded = $message;
+								$outbox->TextDecoded = $pesan;
 								$outbox->save();
 							}
 							
