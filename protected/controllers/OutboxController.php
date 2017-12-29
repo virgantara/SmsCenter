@@ -220,8 +220,8 @@ class OutboxController extends Controller
 								$outbox->save();
 							}
 							
-						}
-					}	
+						} // end !empty kontak
+					}	// end foreach loop k
 
 				}
 
@@ -245,12 +245,49 @@ class OutboxController extends Controller
 							$model = Kontak::model()->findAll($criteria);	
 							foreach($model as $kontak)
 							{
-								$outbox = new Outbox;
-								$outbox->DestinationNumber = $kontak->contact_phone;
-								$outbox->TextDecoded = $_POST['msg'];
-								$outbox->save();
-							}
-						}
+								$multiparts = Yii::app()->helper->generateMultipartMessage($_POST['msg']);
+								$phone = $kontak->contact_phone;
+								$ID = $multiparts['ID'];
+								$pesan = $_POST['msg'];
+								if($multiparts['isMultipart'])
+								{
+									foreach($multiparts['listudh'] as $udh)
+									{
+										$msg = $udh['msg'];
+										$urutan = $udh['urutan'];
+										if($urutan == 1)
+										{
+											$outbox = new Outbox;
+											$outbox->DestinationNumber = $phone;
+											$outbox->TextDecoded = $msg;
+											$outbox->ID = $ID;
+											$outbox->UDH = $udh['UDH'];
+											$outbox->CreatorID = 'megammu';
+											$outbox->MultiPart = 'true';
+											$outbox->save();
+										}
+
+										else
+										{
+											$outboxMultipart = new OutboxMultipart;
+											$outboxMultipart->TextDecoded = $msg;
+											$outboxMultipart->ID = $ID;
+											$outboxMultipart->UDH = $udh['UDH'];
+											$outboxMultipart->SequencePosition = $urutan;
+											$outboxMultipart->save();
+										}
+									}
+								}
+
+								else
+								{
+									$outbox = new Outbox;
+									$outbox->DestinationNumber = $phone;
+									$outbox->TextDecoded = $pesan;
+									$outbox->save();
+								}
+							}// end loop kontak group
+						} // end !empty group
 						
 					}	
 				}
