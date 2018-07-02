@@ -28,7 +28,7 @@ class GroupController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','create','update','admin','delete','removeKontak','ajaxAddToGroup'),
+				'actions'=>array('index','view','create','update','admin','delete','removeKontak','ajaxAddToGroup','removeKontakSingle'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -79,9 +79,19 @@ class GroupController extends Controller
             $checkedIDs=$_GET['checked'];
             foreach($checkedIDs as $id)
             {
-            	$kg = KontakGroup::model()->findByAttributes(array('kontak_id'=>$id));
-                $kg->delete();
+            	$kg = KontakGroup::model()->findByAttributes(array('id_kontak_group'=>$id));
+            	if(!empty($kg))
+                	$kg->delete();
             }
+        }
+	}
+
+	public function actionRemoveKontakSingle($id)
+	{   
+		if(Yii::app()->request->getIsAjaxRequest())
+        {
+            $kg = KontakGroup::model()->findByAttributes(array('id_kontak_group'=>$id));
+            $kg->delete();
         }
 	}
 
@@ -92,6 +102,8 @@ class GroupController extends Controller
 	public function actionView($id)
 	{
 		$kontak = new Kontak;
+		$kontakGroup = new KontakGroup;
+		$kontakGroup->group_id = $id;
 
 		if(isset($_GET['filter']))
 			$kontak->SEARCH=$_GET['filter'];
@@ -101,6 +113,7 @@ class GroupController extends Controller
 
 		$this->render('view',array(
 			'model'=>$this->loadModel($id),
+			'kontakGroup' => $kontakGroup,
 			'kontak' => $kontak,
 		));
 	}

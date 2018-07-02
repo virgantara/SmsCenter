@@ -81,15 +81,15 @@ echo CHtml::button("Hapus Kontak Dari Grup",array("id"=>"butt"));
 
  $this->widget('application.components.ComplexGridView', array(
 	'id'=>'kontak-grid',
-	'dataProvider'=>$kontak->searchByGroup($model->group_id),
+	'dataProvider'=>$kontakGroup->search(),
 	'columns'=>array(
 		array(
 			'header' => 'No',
 			'value'	=> '$this->grid->dataProvider->pagination->currentPage * $this->grid->dataProvider->pagination->pageSize + ($row+1)',
 		),
  
-		'contact_name',
-		'contact_phone',
+		'kontak.contact_name',
+		'kontak.contact_phone',
 		// 'TextDecoded',
 		
 		
@@ -97,6 +97,16 @@ echo CHtml::button("Hapus Kontak Dari Grup",array("id"=>"butt"));
                 'class'=>'CCheckBoxColumn',  //Tambahkan kolom untuk checkbos.
                 'selectableRows'=>2,         //MULTIPLE ROWS CAN BE SELECTED.
                 ),
+
+		 array(
+		 	'class'=>'CButtonColumn',
+      		'template'=>'{delete}',
+      		'buttons' => array(
+      			'delete' => array(
+	              'url'=>'Yii::app()->createUrl("group/removeKontakSingle/", array("id"=>$data->id_kontak_group))',   
+	            ),
+      		)
+		 ),
 
 	),
 	'pager'=>array(
@@ -128,7 +138,7 @@ $("#butt").click(function(){
         {
                 $.ajax({
                         data:{checked:checked},
-                        url:"'.CHtml::normalizeUrl(array('group/removeKontak')).'",
+                        url:"'.Yii::app()->createUrl('group/removeKontak',array('group_id'=>$model->group_id)).'",
                         success:function(data){$("#kontak-grid").yiiGridView("update",{});},              
                 });
         }

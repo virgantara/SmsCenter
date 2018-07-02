@@ -7,6 +7,10 @@
  * @property integer $id_kontak_group
  * @property integer $kontak_id
  * @property integer $group_id
+ *
+ * The followings are the available model relations:
+ * @property Group $group
+ * @property Kontak $kontak
  */
 class KontakGroup extends CActiveRecord
 {
@@ -42,6 +46,8 @@ class KontakGroup extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'group' => array(self::BELONGS_TO, 'Group', 'group_id'),
+			'kontak' => array(self::BELONGS_TO, 'Kontak', 'kontak_id'),
 		);
 	}
 
